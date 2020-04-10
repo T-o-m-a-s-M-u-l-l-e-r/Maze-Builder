@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Buildings.Building;
+import Buildings.Structure;
 import Components.GamePanel;
 import Components.Launcher;
 import Enemies.Enemy;
@@ -24,8 +25,9 @@ public class Level {
 	public static final char PATH_SYMBOL = '1';
 	public static final char PATH_END_SYMBOL = 'X';
 	public int playerHealth, playerMoney;
-	private char[][] map = new char[Launcher.FRAME_WIDTH / GamePanel.TILE_WIDTH][Launcher.FRAME_HEIGHT
+	private char[][] tileMap = new char[Launcher.FRAME_WIDTH / GamePanel.TILE_WIDTH][Launcher.FRAME_HEIGHT
 			/ GamePanel.TILE_HEIGHT];
+	private int[][] buildingMap = new int[Launcher.FRAME_WIDTH/Building.SIZE][Launcher.FRAME_HEIGHT/Building.SIZE];
 	private int levelNumber;
 	private int bounty = 0;
 	private Wave currentWave;
@@ -47,12 +49,20 @@ public class Level {
 	}
 
 	public void test() {
-		for (int y = 0; y < map[0].length; y++) {
-			for (int x = 0; x < map.length; x++) {
-				System.out.print(map[x][y]);
+//		for (int y = 0; y < tileMap[0].length; y++) {
+//			for (int x = 0; x < tileMap.length; x++) {
+//				System.out.print(tileMap[x][y]);
+//			}
+//			System.out.println();
+//		}
+		for (int y = 0; y < buildingMap[0].length; y++) {
+			for (int x = 0; x < buildingMap.length; x++) {
+				System.out.print(buildingMap[x][y]);
 			}
 			System.out.println();
 		}
+		
+		System.out.println();
 	}
 
 	public boolean nextWave() {
@@ -78,12 +88,20 @@ public class Level {
 		return true;
 	}
 
-	public void build(MouseEvent e) {
+	public void build(MouseEvent e, Structure structure) {
 		int cost = 50;
+		
+		int mapX = e.getX()/Building.SIZE;
+		int mapY = e.getY()/Building.SIZE;
 
-		if (!checkBuildingCollision(e) && !waveOngoing) {
+		if (!checkBuildingCollision(mapX, mapY, structure.getPoints()) && !waveOngoing) {
 			if (!spendMoney(cost)) {
-				buildings.add(new Building(e.getX(), e.getY(), enemies));
+				buildings.add(new Building(mapX*Building.SIZE, mapY*Building.SIZE, enemies));
+				
+				buildingMap[mapX][mapY] = 1;
+				for (Point point : structure.getPoints()) {
+					buildingMap[mapX+point.x][mapY+point.y] = 1;
+				}
 			}
 		}
 	}
@@ -116,9 +134,9 @@ public class Level {
 	}
 
 	public void paint(Graphics2D g2) {
-		for (int x = 0; x < map.length; x++) {
-			for (int y = 0; y < map[0].length; y++) {
-				switch (map[x][y]) {
+		for (int x = 0; x < tileMap.length; x++) {
+			for (int y = 0; y < tileMap[0].length; y++) {
+				switch (tileMap[x][y]) {
 				case '0':
 					g2.setColor(Color.green);
 					break;
@@ -148,17 +166,13 @@ public class Level {
 		}
 	}
 
-	public boolean checkBuildingCollision(MouseEvent e) {
-		Rectangle box = new Rectangle(e.getX() - Building.SIZE / 2, e.getY() - Building.SIZE / 2, Building.SIZE,
-				Building.SIZE);
-		for (Building building : buildings) {
-			if (box.intersects(building.getCollisionBox())) {
-				return true;
-			}
+	public boolean checkBuildingCollision(int mapX, int mapY, Point[] pointStructure) {
+		if (buildingMap[mapX][mapY] != 0) {
+			return true;
 		}
-
-		for (Rectangle collisionBox : pathCollision) {
-			if (box.intersects(collisionBox)) {
+		
+		for (int i = 0; i < pointStructure.length; i++) {
+			if (buildingMap[mapX+pointStructure[i].x][mapY+pointStructure[i].y] != 0) {
 				return true;
 			}
 		}
@@ -197,7 +211,7 @@ public class Level {
 				count++;
 			} else if (count == levelNumber) {
 				for (int x = 0; x < line.length(); x++) {
-					map[x][y] = line.charAt(x);
+					tileMap[x][y] = line.charAt(x);
 				}
 				y++;
 			}
@@ -210,7 +224,7 @@ public class Level {
 		Point end = getPathEnd();
 		Point currentPoint = getPathStart();
 		Point lastVisited = null;
-		map[getPathEnd().x][getPathEnd().y] = PATH_SYMBOL;
+		tileMap[getPathEnd().x][getPathEnd().y] = PATH_SYMBOL;
 
 		while (!currentPoint.equals(end)) {
 
@@ -233,7 +247,7 @@ public class Level {
 				}
 
 				try {
-					if (map[newPoint.x][newPoint.y] == PATH_SYMBOL && !newPoint.equals(lastVisited)) {
+					if (tileMap[newPoint.x][newPoint.y] == PATH_SYMBOL && !newPoint.equals(lastVisited)) {
 						lastVisited = currentPoint;
 						currentPoint = newPoint;
 						break;
@@ -250,9 +264,9 @@ public class Level {
 			}
 		}
 
-		for (int a = 0; a < map.length; a++) {
-			for (int b = 0; b < map[0].length; b++) {
-				if (map[a][b] == PATH_SYMBOL) {
+		for (int a = 0; a < tileMap.length; a++) {
+			for (int b = 0; b < tileMap[0].length; b++) {
+				if (tileMap[a][b] == PATH_SYMBOL) {
 					pathCollision.add(new Rectangle(a * GamePanel.TILE_WIDTH, b * GamePanel.TILE_HEIGHT,
 							GamePanel.TILE_WIDTH, GamePanel.TILE_HEIGHT));
 				}
@@ -271,9 +285,9 @@ public class Level {
 
 	public Point getPathStart() {
 
-		for (int y = 0; y < map[0].length; y++) {
-			for (int x = 0; x < map.length; x++) {
-				if (map[x][y] == PATH_SYMBOL && (x == 0 || y == 0 || x == map.length - 1 || y == map[0].length - 1)) {
+		for (int y = 0; y < tileMap[0].length; y++) {
+			for (int x = 0; x < tileMap.length; x++) {
+				if (tileMap[x][y] == PATH_SYMBOL && (x == 0 || y == 0 || x == tileMap.length - 1 || y == tileMap[0].length - 1)) {
 					return new Point(x, y);
 				}
 			}
@@ -284,9 +298,9 @@ public class Level {
 
 	public Point getPathEnd() {
 
-		for (int y = 0; y < map[0].length; y++) {
-			for (int x = 0; x < map.length; x++) {
-				if (map[x][y] == PATH_END_SYMBOL) {
+		for (int y = 0; y < tileMap[0].length; y++) {
+			for (int x = 0; x < tileMap.length; x++) {
+				if (tileMap[x][y] == PATH_END_SYMBOL) {
 					return new Point(x, y);
 				}
 			}
@@ -297,28 +311,28 @@ public class Level {
 
 	public boolean isPathPoint(int x, int y) {
 
-		if (map[x][y] != PATH_SYMBOL) {
+		if (tileMap[x][y] != PATH_SYMBOL) {
 			return false;
 		}
 
-		if (map[x][y] == PATH_END_SYMBOL) {
+		if (tileMap[x][y] == PATH_END_SYMBOL) {
 			return true;
 		}
 
 		try {
-			if (map[x - 1][y] != PATH_SYMBOL && map[x][y - 1] != PATH_SYMBOL) {
+			if (tileMap[x - 1][y] != PATH_SYMBOL && tileMap[x][y - 1] != PATH_SYMBOL) {
 				return true;
 			}
 
-			if (map[x - 1][y] != PATH_SYMBOL && map[x][y + 1] != PATH_SYMBOL) {
+			if (tileMap[x - 1][y] != PATH_SYMBOL && tileMap[x][y + 1] != PATH_SYMBOL) {
 				return true;
 			}
 
-			if (map[x + 1][y] != PATH_SYMBOL && map[x][y - 1] != PATH_SYMBOL) {
+			if (tileMap[x + 1][y] != PATH_SYMBOL && tileMap[x][y - 1] != PATH_SYMBOL) {
 				return true;
 			}
 
-			if (map[x + 1][y] != PATH_SYMBOL && map[x][y + 1] != PATH_SYMBOL) {
+			if (tileMap[x + 1][y] != PATH_SYMBOL && tileMap[x][y + 1] != PATH_SYMBOL) {
 				return true;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {

@@ -94,7 +94,7 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public void mousePressed(MouseEvent e) {
 		if (playerIsBuilding && e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK) {
 			playerIsBuilding = false;
-			currentLevel.build(e);
+			currentLevel.build(e, Building.getStructure());
 		}
 	}
 

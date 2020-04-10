@@ -8,25 +8,31 @@ import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Components.GamePanel;
 import Enemies.Enemy;
 
 public class Building {
-	public static final int SIZE = 64;
+	public static final int SIZE = 32;
 	public int radius = 80;
 	private int cooldown = 1000;
 	private boolean canShoot = true;
-	private Rectangle collisionBox;
+	private Rectangle centerBox;
 	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private ArrayList<Enemy> enemies;
+	private static final Structure structure = new Structure(new Point(1, 0), new Point(0, 1));
+	private ArrayList<Rectangle> drawingBox = new ArrayList<Rectangle>();
 	
 	public Building(int x, int y, ArrayList<Enemy> enemies) {
-		collisionBox = new Rectangle(x-SIZE/2, y-SIZE/2, SIZE, SIZE);
+		centerBox = new Rectangle(x, y, SIZE, SIZE);
 		this.enemies = enemies;
+		drawingBox = structure.getCollisionBox(x, y);
 	}
 	
-	public Rectangle getCollisionBox() {
-		return collisionBox;
+	public ArrayList<Rectangle> getCollisionBox() {
+		return drawingBox;
+	}
+	
+	public static Structure getStructure() {
+		return structure;
 	}
 	
 	public void tick() {
@@ -37,7 +43,7 @@ public class Building {
 	}
 	
 	public Point getCenter() {
-		return new Point(collisionBox.x+SIZE/2, collisionBox.y+SIZE/2);
+		return new Point(centerBox.x+SIZE/2, centerBox.y+SIZE/2);
 	}
 	
 	public void shoot() {
@@ -56,7 +62,7 @@ public class Building {
 			
 		try {
 		if (target != null && canShoot) {
-			projectiles.add(new Projectile(collisionBox.x+SIZE/2, collisionBox.y+SIZE/2, target));
+			projectiles.add(new Projectile(centerBox.x+SIZE/2, centerBox.y+SIZE/2, target));
 			canShoot = false;
 			new Timer().schedule(new TimerTask() {
 				
@@ -128,7 +134,10 @@ public class Building {
 //		g2.setColor(Color.yellow);
 //		g2.fillOval(collisionBox.x+SIZE/2-radius, collisionBox.y+SIZE/2-radius, radius*2, radius*2);
 		g2.setColor(Color.blue);
-		g2.fillRect(collisionBox.x, collisionBox.y, SIZE, SIZE);
+		g2.fillRect(centerBox.x, centerBox.y, SIZE, SIZE);
+		for (Rectangle rectangle : drawingBox) {
+			g2.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		}
 		try {
 		for (Projectile projectile : projectiles) {
 			projectile.paint(g2);

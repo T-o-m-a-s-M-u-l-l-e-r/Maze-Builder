@@ -13,8 +13,11 @@ import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Buildings.BuildType;
 import Buildings.Building;
 import Buildings.Structure;
+import Buildings.Turret;
+import Buildings.Wall;
 import Components.GamePanel;
 import Components.Launcher;
 import Enemies.Enemy;
@@ -88,15 +91,23 @@ public class Level {
 		return true;
 	}
 
-	public void build(MouseEvent e, Structure structure) {
+	public void build(MouseEvent e, BuildType type) {
 		int cost = 50;
 		
 		int mapX = e.getX()/Building.SIZE;
 		int mapY = e.getY()/Building.SIZE;
+		
+		Building building = null;
+		switch (type) {
+		case Turret: building = new Turret(mapX*Building.SIZE, mapY*Building.SIZE, enemies); break;
+		case Wall: building = new Wall(mapX*Building.SIZE, mapY*Building.SIZE); break;
+		}
+		
+		Structure structure = BuildType.getStructure(type);
 
 		if (!checkBuildingCollision(mapX, mapY, structure.getPoints()) && !waveOngoing) {
 			if (!spendMoney(cost)) {
-				buildings.add(new Building(mapX*Building.SIZE, mapY*Building.SIZE, enemies));
+				buildings.add(building);
 				
 				buildingMap[mapX][mapY] = 1;
 				for (Point point : structure.getPoints()) {

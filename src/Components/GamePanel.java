@@ -16,14 +16,16 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
+import Buildings.BuildType;
 import Buildings.Building;
+import Buildings.Turret;
 import Enemies.Enemy;
 import Levels.Level;
 
 public class GamePanel extends JPanel implements MouseListener, KeyListener, MouseMotionListener {
+	private BuildType buildSelection = null;
 	public static final int TILE_WIDTH = 32;
 	public static final int TILE_HEIGHT = 32;
-	private boolean playerIsBuilding = false;
 	private int mouseX, mouseY;
 	private static File levels;
 	private static Level currentLevel;
@@ -54,11 +56,12 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		currentLevel.paint(g2);
 
 		g2.setColor(Color.cyan);
-		if (playerIsBuilding) {
+		if (buildSelection != null) {
 			g2.fillRect(mouseX - Building.SIZE / 2, mouseY - Building.SIZE / 2, Building.SIZE, Building.SIZE);
 		}
 		g2.setColor(Color.black);
 		g2.drawString(String.valueOf(currentLevel.playerMoney), 20, 20);
+		g2.drawString("1 - Turret \n 2 - Wall", 20, 40);
 	}
 
 	public static void startWaveCooldown() {
@@ -92,9 +95,9 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (playerIsBuilding && e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK) {
-			playerIsBuilding = false;
-			currentLevel.build(e, Building.getStructure());
+		if (e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK && buildSelection != null) {
+			currentLevel.build(e, buildSelection);
+			buildSelection = null;
 		}
 	}
 
@@ -125,10 +128,11 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			playerIsBuilding = false;
-		}
-		if (e.getKeyCode() == KeyEvent.VK_A) {
-			playerIsBuilding = true;
+			buildSelection = null;
+		} else if (e.getKeyCode() == KeyEvent.VK_1) {
+			buildSelection = BuildType.Turret;
+		} else if (e.getKeyCode() == KeyEvent.VK_2) {
+			buildSelection = BuildType.Wall;
 		}
 	}
 

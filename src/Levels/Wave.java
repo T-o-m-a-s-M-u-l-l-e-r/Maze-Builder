@@ -29,6 +29,12 @@ public class Wave {
 		return enemy;
 	}
 	
+	public void setPath(ArrayList<Point> path) {
+		for (Enemy enemy : enemies) {
+			enemy.setPath(path);
+		}
+	}
+	
 	public boolean isEmpty() {
 		return enemies.isEmpty();
 	}

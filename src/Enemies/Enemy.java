@@ -37,6 +37,10 @@ public class Enemy {
 		bar.paint(g2);
 	}
 	
+	public void setPath(ArrayList<Point> path) {
+		this.path = path;
+	}
+
 	public double getHealth() {
 		return health;
 	}

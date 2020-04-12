@@ -60,12 +60,11 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 			g2.fillRect(mouseX - Building.SIZE / 2, mouseY - Building.SIZE / 2, Building.SIZE, Building.SIZE);
 		}
 		g2.setColor(Color.black);
-		g2.drawString(String.valueOf(currentLevel.playerMoney), 20, 20);
-		g2.drawString("1 - Turret \n 2 - Wall", 20, 40);
+		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
+		g2.drawString("1 - Turret \n 2 - Wall", 8, 52);
 	}
 
 	public static void startWaveCooldown() {
-		System.out.println("cooldown");
 		new Timer().schedule(new TimerTask() {
 
 			@Override

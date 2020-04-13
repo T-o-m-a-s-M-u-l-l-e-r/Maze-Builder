@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -18,7 +19,7 @@ import javax.swing.JPanel;
 
 import Buildings.BuildType;
 import Buildings.Building;
-import Buildings.Turret;
+import Buildings.Structure;
 import Enemies.Enemy;
 import Levels.Level;
 
@@ -55,13 +56,21 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		Graphics2D g2 = (Graphics2D) g;
 		currentLevel.paint(g2);
 
-		g2.setColor(Color.cyan);
-		if (buildSelection != null) {
-			g2.fillRect(mouseX - Building.SIZE / 2, mouseY - Building.SIZE / 2, Building.SIZE, Building.SIZE);
-		}
+		showBuildingPreview(g2);
 		g2.setColor(Color.black);
 		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
 		g2.drawString("1 - Turret \n 2 - Wall", 8, 52);
+	}
+	
+	public void showBuildingPreview(Graphics2D g2) {
+		if (buildSelection != null) {
+			g2.setColor(Color.cyan);
+			g2.fillRect(mouseX - Building.SIZE / 2, mouseY - Building.SIZE / 2, Building.SIZE, Building.SIZE);
+			Structure structure = BuildType.getStructure(buildSelection);
+			for (Point point : structure.getPoints()) {
+				g2.fillRect((point.x*Building.SIZE)+(mouseX - Building.SIZE / 2), (point.y*Building.SIZE)+(mouseY - Building.SIZE / 2), Building.SIZE, Building.SIZE);
+			}
+		}
 	}
 
 	public static void startWaveCooldown() {
@@ -82,8 +91,8 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		System.out.println("Game Over");
 	}
 
-	public void tick() {
-		currentLevel.tick();
+	public void tick(long delta) {
+		currentLevel.tick(delta);
 	}
 
 	@Override

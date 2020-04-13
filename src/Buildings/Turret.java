@@ -40,7 +40,7 @@ public class Turret extends Building {
 		}
 	}
 
-	public void tick() {
+	public void tick(long delta) {
 		shoot();
 		try {
 			for (Projectile projectile : projectiles) {

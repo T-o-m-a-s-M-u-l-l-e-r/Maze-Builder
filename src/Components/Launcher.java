@@ -24,15 +24,15 @@ public class Launcher extends JFrame implements KeyListener{
 		
 	      long lastTime = System.nanoTime();
 	      double timePerFrame = 1000000000 / FPS;
-	      double delta = 0;
+	      long delta = 0;
 	      
 	      while(true) {
 	       long now = System.nanoTime();
-	       delta += (now - lastTime) / timePerFrame;
+	       delta += now - lastTime;
 	       lastTime = now;
-	       while(delta >= 1) {
-	        panel.tick();
-	        delta--;
+	       while(delta >= timePerFrame) {
+	        panel.tick(delta);
+	        delta -= timePerFrame;
 	       }
 	       repaint();
 	      }

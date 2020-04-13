@@ -1,11 +1,17 @@
 package Enemies;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 import Components.GamePanel;
+import Utility.Animation;
+import Utility.Utility;
 
 public class Enemy {
 	public static final int BOUNTY = 30;
@@ -19,6 +25,8 @@ public class Enemy {
 	private int pathIndex = 0;
 	private double speed = 1.5;
 	private boolean alive = true;
+	private Animation animation;
+	private BufferedImage texture;
 
 	public Enemy(ArrayList<Point> path) {
 		width = height = 16;
@@ -29,11 +37,18 @@ public class Enemy {
 		maxHealth = health = 50;
 		bar = new HealthBar(this);
 		this.path = path;
+		ArrayList<BufferedImage> frames;
+		try {
+			frames = Utility.getTiles(ImageIO.read(new File("testTileset.png")), 16, 16);
+			texture = frames.get(0);
+			animation = new Animation(frames, .15);
+		} catch (IOException e) {
+		}
+		
 	}
 	
 	public void paint(Graphics2D g2) {
-		g2.setColor(Color.black);
-		g2.fillRect((int)x, (int)y, collisionBox.width, collisionBox.height);
+		g2.drawImage(texture, (int)x, (int)y, collisionBox.width, collisionBox.height, null);
 		bar.paint(g2);
 	}
 	
@@ -85,7 +100,7 @@ public class Enemy {
 		}
 	}
 	
-	public void tick() {
+	public void tick(long delta) {
 		Point pathPoint = path.get(pathIndex);
 		if (moveToPosition(pathPoint)) {
 			pathIndex++;
@@ -94,6 +109,7 @@ public class Enemy {
 			}
 		}
 		collisionBox.setLocation((int)x, (int)y);
+		texture = animation.getFrame(delta);
 	}
 	
 	public boolean moveToPosition(double toX, double toY) {

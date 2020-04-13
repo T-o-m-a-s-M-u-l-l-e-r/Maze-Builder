@@ -24,7 +24,7 @@ import Utility.Utility;
 
 public class Level {
 	public static final long SPAWN_ENEMY_CD = 1000;
-	public static final long ENEMY_WAVE_CD = 50000;
+	public static final long ENEMY_WAVE_CD = 5000;
 	public static final char PATH_SYMBOL = '1';
 	public static final char PATH_END_SYMBOL = 'X';
 	public int playerHealth, playerMoney;
@@ -200,10 +200,10 @@ public class Level {
 		return false;
 	}
 
-	public void tick() {
+	public void tick(long delta) {
 		try {
 			for (Building building : buildings) {
-				building.tick();
+				building.tick(delta);
 			}
 
 		} catch (ConcurrentModificationException e) {
@@ -212,7 +212,7 @@ public class Level {
 
 		try {
 			for (Enemy enemy : enemies) {
-				enemy.tick();
+				enemy.tick(delta);
 			}
 		} catch (ConcurrentModificationException e) {
 

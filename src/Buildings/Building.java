@@ -24,7 +24,7 @@ public class Building {
 		return null;
 	}
 
-	public void tick() {
+	public void tick(long delta) {
 	}
 
 	public Point getCenter() {

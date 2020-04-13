@@ -15,17 +15,23 @@ public class Turret extends Building {
 	public int radius = 80;
 	private int cooldown = 1000;
 	private boolean canShoot = true;
+	private Rectangle centerBox;
 	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private ArrayList<Enemy> enemies;
 
 	public Turret(int x, int y, ArrayList<Enemy> enemies) {
 		super(x, y);
 		this.enemies = enemies;
+		centerBox = collisionBox.get(0);
 	}
 	
 	@Override
 	public BuildType getBuildingType() {
 		return BuildType.Turret;
+	}
+	
+	public Point getCenter() {
+		return new Point(centerBox.x+SIZE/2, centerBox.y+SIZE/2);
 	}
 
 	@Override
@@ -67,7 +73,7 @@ public class Turret extends Building {
 
 		try {
 			if (target != null && canShoot) {
-				projectiles.add(new Projectile(centerBox.x + SIZE / 2, centerBox.y + SIZE / 2, target));
+				projectiles.add(new Projectile(centerBox.x, centerBox.y, target));
 				canShoot = false;
 				new Timer().schedule(new TimerTask() {
 
@@ -94,8 +100,8 @@ public class Turret extends Building {
 
 		public Projectile(double x, double y, Enemy enemy) {
 			this.enemy = enemy;
-			this.x = x - SIZE / 2;
-			this.y = y - SIZE / 2;
+			this.x = x;
+			this.y = y;
 			collisionBox = new Rectangle((int) x, (int) y, SIZE, SIZE);
 		}
 

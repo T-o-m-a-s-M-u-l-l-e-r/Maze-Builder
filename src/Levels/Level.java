@@ -3,6 +3,7 @@ package Levels;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +25,7 @@ import Utility.Utility;
 
 public class Level {
 	public static final long SPAWN_ENEMY_CD = 1000;
-	public static final long ENEMY_WAVE_CD = 5000;
+	public static final long ENEMY_WAVE_CD = 50000;
 	public static final char PATH_SYMBOL = '1';
 	public static final char PATH_END_SYMBOL = 'X';
 	public int playerHealth, playerMoney;
@@ -49,6 +50,17 @@ public class Level {
 			readFile(levels);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void test() {
+		System.out.println(buildings.size());
+		
+		for (int y = 0; y < buildingMap[0].length; y++) {
+			for (int x = 0; x < buildingMap.length; x++) {
+				System.out.print(buildingMap[x][y]);
+			}
+			System.out.println();
 		}
 	}
 
@@ -107,6 +119,28 @@ public class Level {
 				}
 			}
 		}
+	}
+	
+	public void remove(MouseEvent e) {
+		test();
+		Building buildingToRemove = null;
+		
+		for (Building building : buildings) {
+			if (building.containsPoint(e.getX(), e.getY())) {
+				buildingToRemove = building;
+				break;
+			}
+		}
+		
+		try {
+		for (Rectangle rectangle : buildingToRemove.getCollisionBox()) {
+			buildingMap[rectangle.x/Building.SIZE][rectangle.y/Building.SIZE] = 0;
+		}
+		buildings.remove(buildingToRemove);
+		} catch (NullPointerException a) {
+			
+		}
+		test();
 	}
 
 	public void deleteEnemy(Enemy e, boolean reachedEnd) {
@@ -187,6 +221,7 @@ public class Level {
 	}
 
 	public boolean checkBuildingCollision(int mapX, int mapY, Point[] pointStructure) {
+		try {
 		if (buildingMap[mapX][mapY] != 0) {
 			return true;
 		}
@@ -195,6 +230,9 @@ public class Level {
 			if (buildingMap[mapX+pointStructure[i].x][mapY+pointStructure[i].y] != 0) {
 				return true;
 			}
+		}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return true;
 		}
 
 		return false;

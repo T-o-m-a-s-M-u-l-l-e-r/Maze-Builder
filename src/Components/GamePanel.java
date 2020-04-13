@@ -1,6 +1,7 @@
 package Components;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,6 +26,7 @@ import Levels.Level;
 
 public class GamePanel extends JPanel implements MouseListener, KeyListener, MouseMotionListener {
 	private BuildType buildSelection = null;
+	private ClickType clickSelection = null;
 	public static final int TILE_WIDTH = 32;
 	public static final int TILE_HEIGHT = 32;
 	private int mouseX, mouseY;
@@ -59,7 +61,7 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		showBuildingPreview(g2);
 		g2.setColor(Color.black);
 		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
-		g2.drawString("1 - Turret \n 2 - Wall", 8, 52);
+		g2.drawString("1 - Turret \n 2 - Wall \n 3 - Remove", 8, 52);
 	}
 	
 	public void showBuildingPreview(Graphics2D g2) {
@@ -103,9 +105,14 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK && buildSelection != null) {
-			currentLevel.build(e, buildSelection);
+		if (e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK && clickSelection != null) {
+			
+			switch (clickSelection) {
+			case Build: currentLevel.build(e, buildSelection); break;
+			case Remove: currentLevel.remove(e); break;
+			}
 			buildSelection = null;
+			clickSelection = null;
 		}
 	}
 
@@ -137,10 +144,15 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			buildSelection = null;
+			clickSelection = null;
 		} else if (e.getKeyCode() == KeyEvent.VK_1) {
 			buildSelection = BuildType.Turret;
+			clickSelection = ClickType.Build;
 		} else if (e.getKeyCode() == KeyEvent.VK_2) {
 			buildSelection = BuildType.Wall;
+			clickSelection = ClickType.Build;
+		} else if (e.getKeyCode() == KeyEvent.VK_3) {
+			clickSelection = ClickType.Remove;
 		}
 	}
 

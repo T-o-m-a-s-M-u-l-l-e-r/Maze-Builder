@@ -67,10 +67,12 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public void showBuildingPreview(Graphics2D g2) {
 		if (buildSelection != null) {
 			g2.setColor(Color.cyan);
-			g2.fillRect(mouseX - Building.SIZE / 2, mouseY - Building.SIZE / 2, Building.SIZE, Building.SIZE);
+			int x = ((mouseX)/Building.SIZE)*Building.SIZE;
+			int y = ((mouseY)/Building.SIZE)*Building.SIZE;
+			g2.fillRect(x, y, Building.SIZE, Building.SIZE);
 			Structure structure = BuildType.getStructure(buildSelection);
 			for (Point point : structure.getPoints()) {
-				g2.fillRect((point.x*Building.SIZE)+(mouseX - Building.SIZE / 2), (point.y*Building.SIZE)+(mouseY - Building.SIZE / 2), Building.SIZE, Building.SIZE);
+				g2.fillRect((point.x*Building.SIZE)+x, (point.y*Building.SIZE)+y, Building.SIZE, Building.SIZE);
 			}
 		}
 	}

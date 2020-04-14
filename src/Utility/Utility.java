@@ -1,7 +1,13 @@
 package Utility;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+
+import Components.GamePanel;
 
 public class Utility {
 
@@ -17,7 +23,14 @@ public class Utility {
 		return copy;
 	}
 	
-	public static ArrayList<BufferedImage> getTiles(BufferedImage tileSet, int tileWidth, int tileHeight) {
+	public static ArrayList<BufferedImage> getTiles(String tileSetPathName, int tileWidth, int tileHeight) {
+		BufferedImage tileSet = null;
+		try {
+			tileSet = ImageIO.read(new File(tileSetPathName));
+		} catch (IOException e) {
+			return null;
+		}
+		
 		ArrayList<BufferedImage> tiles = new ArrayList<BufferedImage>();
 		for(int y = 0; y < tileSet.getHeight()/tileHeight; y++) {
 			for (int x = 0; x < tileSet.getWidth()/tileWidth; x++) {

@@ -38,12 +38,9 @@ public class Enemy {
 		bar = new HealthBar(this);
 		this.path = path;
 		ArrayList<BufferedImage> frames;
-		try {
-			frames = Utility.getTiles(ImageIO.read(new File("testTileset.png")), 16, 16);
-			texture = frames.get(0);
-			animation = new Animation(frames, .15);
-		} catch (IOException e) {
-		}
+		frames = Utility.getTiles("testTileset.png", 16, 16);
+		texture = frames.get(0);
+		animation = new Animation(frames, .15);
 		
 	}
 	

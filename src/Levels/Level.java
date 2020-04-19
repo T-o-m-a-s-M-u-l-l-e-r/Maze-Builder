@@ -10,14 +10,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Buildings.Bank;
 import Buildings.BuildType;
 import Buildings.Building;
+import Buildings.EnemyType;
 import Buildings.Structure;
 import Buildings.Turret;
 import Buildings.Wall;
+import Buildings.Turret.Projectile;
 import Components.GamePanel;
 import Components.Launcher;
 import Enemies.Enemy;
@@ -97,15 +101,7 @@ public class Level {
 		int mapX = e.getX() / Building.SIZE;
 		int mapY = e.getY() / Building.SIZE;
 
-		Building building = null;
-		switch (type) {
-		case Turret:
-			building = new Turret(mapX * Building.SIZE, mapY * Building.SIZE, enemies);
-			break;
-		case Wall:
-			building = new Wall(mapX * Building.SIZE, mapY * Building.SIZE);
-			break;
-		}
+		Building building = BuildType.getInstance(type, mapX * Building.SIZE, mapY * Building.SIZE, enemies);
 
 		Structure structure = BuildType.getStructure(type);
 		if (!checkBuildingCollision(mapX, mapY, structure.getPoints()) && !waveOngoing) {
@@ -155,7 +151,7 @@ public class Level {
 				GamePanel.gameOver();
 			}
 		} else {
-			bounty += Enemy.BOUNTY;
+			bounty += e.getBounty();
 		}
 
 		if (enemies.isEmpty() && currentWave.isEmpty()) {
@@ -225,12 +221,25 @@ public class Level {
 		} catch (ConcurrentModificationException e) {
 
 		}
+
+		try {
+			for (Projectile projectile : Turret.projectiles) {
+				projectile.paint(g2);
+			}
+		} catch (ConcurrentModificationException e) {
+
+		} catch (NoSuchElementException e) {
+			
+		}
 	}
 
 	public void paintPath(Graphics2D g2) {
 		for (Point point : path) {
 			
-			if (path.indexOf(point) == path.size()-1) {
+			if (path.indexOf(point) == 0) {
+				g2.drawImage(Assets.pathEndTile, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
+				continue;
+			} else if (path.indexOf(point) == path.size()-1) {
 				g2.drawImage(Assets.pathEndTile, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
 				break;
 			}
@@ -288,6 +297,14 @@ public class Level {
 		} catch (ConcurrentModificationException e) {
 
 		}
+		
+		try {
+			for (Projectile projectile : Turret.projectiles) {
+				projectile.tick();
+			}
+		} catch (ConcurrentModificationException e) {
+			
+		}
 
 		try {
 			for (Enemy enemy : enemies) {
@@ -330,7 +347,16 @@ public class Level {
 			if (line.isBlank()) {
 				count++;
 			} else {
-				waves.add(new Wave(line, path));
+				ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+				String string = line.replaceAll(" ", "").trim();
+				
+				for (int i = 0; i < string.length(); i++) {
+					EnemyType type = EnemyType.getType(string.charAt(i));
+					Enemy enemy = EnemyType.getEnemy(type, path);
+					enemies.add(enemy);
+				}
+				
+				waves.add(new Wave(enemies));
 			}
 		}
 		reader.close();

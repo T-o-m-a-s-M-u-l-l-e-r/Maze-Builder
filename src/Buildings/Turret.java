@@ -1,28 +1,30 @@
 package Buildings;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import Enemies.Enemy;
+import Utility.Assets;
 
 public class Turret extends Building {
-	public int radius = 80;
+	public static final int RANGE = 105;
 	private int cooldown = 1000;
 	private boolean canShoot = true;
 	private Rectangle centerBox;
-	private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	public static ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private ArrayList<Enemy> enemies;
 
 	public Turret(int x, int y, ArrayList<Enemy> enemies) {
 		super(x, y);
 		this.enemies = enemies;
 		centerBox = collisionBox.get(0);
+		range = RANGE;
 	}
 	
 	@Override
@@ -36,7 +38,9 @@ public class Turret extends Building {
 
 	@Override
 	public void paint(Graphics2D g2) {
-		super.paint(g2);
+		for (Rectangle rectangle : collisionBox) {
+			g2.drawImage(Assets.turretTile, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+		}
 		try {
 			for (Projectile projectile : projectiles) {
 				projectile.paint(g2);
@@ -48,13 +52,6 @@ public class Turret extends Building {
 
 	public void tick(long delta) {
 		shoot();
-		try {
-			for (Projectile projectile : projectiles) {
-				projectile.tick();
-			}
-		} catch (ConcurrentModificationException e) {
-			
-		}
 	}
 
 	public void shoot() {
@@ -65,7 +62,7 @@ public class Turret extends Building {
 			double a = Math.abs(getCenter().x - enemy.getCenterX());
 			double b = Math.abs(getCenter().y - enemy.getCenterY());
 			double distance = Math.pow(Math.pow(a, 2) + Math.pow(b, 2), 1 / 2.0);
-			if (distance <= radius && (distance < lowestDistance || lowestDistance < 0)) {
+			if (distance <= range && (distance < lowestDistance || lowestDistance < 0)) {
 				lowestDistance = distance;
 				target = enemy;
 			}
@@ -93,10 +90,11 @@ public class Turret extends Building {
 	public class Projectile {
 		private Enemy enemy;
 		private double x, y;
-		private double speed = 2.5;
+		private double speed = 6.5;
 		private Rectangle collisionBox;
 		public static final int SIZE = 16;
 		private int damage = 25;
+		private BufferedImage texture = Assets.projectileTile;
 
 		public Projectile(double x, double y, Enemy enemy) {
 			this.enemy = enemy;
@@ -135,8 +133,7 @@ public class Turret extends Building {
 		}
 
 		public void paint(Graphics2D g2) {
-			g2.setColor(Color.red);
-			g2.fillOval((int) x, (int) y, SIZE, SIZE);
+			g2.drawImage(texture, (int)x, (int)y, null);
 		}
 
 	}

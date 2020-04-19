@@ -14,10 +14,10 @@ public class HealthBar {
 	
 	public void paint(Graphics2D g2) {
 		g2.setColor(Color.black);
-		g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getHeight()/2-yOffset-height/2), (int)width, (int)height);
+		g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getCollisionBox().height/2-yOffset-height/2), (int)width, (int)height);
 		double percWidth = width*(enemy.getHealth()/enemy.getMaxHealth());
 		g2.setColor(Color.red);
-		g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getHeight()/2-yOffset-height/2), (int)percWidth, (int)height);
+		g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getCollisionBox().height/2-yOffset-height/2), (int)percWidth, (int)height);
 	}
 	
 }

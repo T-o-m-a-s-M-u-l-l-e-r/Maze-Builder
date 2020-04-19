@@ -3,50 +3,55 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import Components.GamePanel;
 import Utility.Animation;
 import Utility.Utility;
 
 public class Enemy {
-	public static final int BOUNTY = 30;
-	private Rectangle collisionBox;
-	private double health;
-	private double maxHealth;
-	private double x, y;
-	private int width, height;
-	private HealthBar bar;
-	private ArrayList<Point> path;
-	private int pathIndex = 0;
-	private double speed = 1.5;
-	private boolean alive = true;
-	private Animation animation;
-	private BufferedImage texture;
+	public static final int DEFAULT_BOUNTY = 30;
+	public static final int DEFAULT_WIDTH = 16;
+	public static final int DEFAULT_HEIGHT = 16;
+	public static final int DEFAULT_HEALTH = 50;
+	public static final double DEFAULT_SPEED = 1.5;
+	protected int bounty = DEFAULT_BOUNTY;
+	protected Rectangle collisionBox;
+	protected double health = DEFAULT_HEALTH;
+	protected double maxHealth = DEFAULT_HEALTH;
+	protected HealthBar bar;
+	protected ArrayList<Point> path;
+	protected double x, y;
+	protected int pathIndex = 0;
+	protected double speed = DEFAULT_SPEED;
+	protected boolean alive = true;
+	protected Animation animation;
+	protected BufferedImage texture;
 
 	public Enemy(ArrayList<Point> path) {
-		width = height = 16;
 		Point spawnPoint = path.get(0);
-		this.x = spawnPoint.x-width/2;
-		this.y = spawnPoint.y-height/2;
-		collisionBox = new Rectangle((int)x, (int)y, width, height);
-		maxHealth = health = 50;
+		this.x = spawnPoint.x-DEFAULT_WIDTH/2;
+		this.y = spawnPoint.y-DEFAULT_HEIGHT/2;
+		collisionBox = new Rectangle((int)x, (int)y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		bar = new HealthBar(this);
 		this.path = path;
-		ArrayList<BufferedImage> frames;
-		frames = Utility.getTiles("testTileset.png", 16, 16);
+		
+		ArrayList<BufferedImage> frames = getFrames();
 		texture = frames.get(0);
 		animation = new Animation(frames, .15);
-		
+	}
+	
+	public ArrayList<BufferedImage> getFrames() {
+		return Utility.getTiles("an.png", 32, 32);
 	}
 	
 	public void paint(Graphics2D g2) {
 		g2.drawImage(texture, (int)x, (int)y, collisionBox.width, collisionBox.height, null);
 		bar.paint(g2);
+	}
+	
+	public int getBounty() {
+		return bounty;
 	}
 	
 	public void setPath(ArrayList<Point> path) {
@@ -61,14 +66,6 @@ public class Enemy {
 		return maxHealth;
 	}
 
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
 	public int getX() {
 		return collisionBox.x;
 	}
@@ -78,11 +75,11 @@ public class Enemy {
 	}
 	
 	public double getCenterX() {
-		return x+width/2;
+		return x+collisionBox.width/2;
 	}
 	
 	public double getCenterY() {
-		return y+height/2;
+		return y+collisionBox.height/2;
 	}
 
 	public Rectangle getCollisionBox() {
@@ -131,11 +128,11 @@ public class Enemy {
 		}
 		
 		if(Math.abs(getCenterY()-toY) <= speed) {
-			y = toY-height/2;
+			y = toY-collisionBox.height/2;
 		}
 		
 		if(Math.abs(getCenterX()-toX) <= speed) {
-			x = toX-width/2;
+			x = toX-collisionBox.width/2;
 		}
 		
 		if ((int)getCenterY() == (int)toY && (int)getCenterX() == (int)toX) {

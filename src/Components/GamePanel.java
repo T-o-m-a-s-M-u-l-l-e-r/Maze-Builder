@@ -1,7 +1,7 @@
 package Components;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,6 +23,7 @@ import Buildings.Building;
 import Buildings.Structure;
 import Enemies.Enemy;
 import Levels.Level;
+import Utility.Assets;
 
 public class GamePanel extends JPanel implements MouseListener, KeyListener, MouseMotionListener {
 	private BuildType buildSelection = null;
@@ -61,20 +62,25 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		showBuildingPreview(g2);
 		g2.setColor(Color.black);
 		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
-		g2.drawString("1 - Turret \n 2 - Wall \n 3 - Remove", 8, 52);
+		g2.drawString("1 - Turret \n 2 - Wall \n 3 - Bank \n 4 - Remove", 8, 52);
 	}
 	
 	public void showBuildingPreview(Graphics2D g2) {
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		
 		if (buildSelection != null) {
-			g2.setColor(Color.cyan);
 			int x = ((mouseX)/Building.SIZE)*Building.SIZE;
 			int y = ((mouseY)/Building.SIZE)*Building.SIZE;
-			g2.fillRect(x, y, Building.SIZE, Building.SIZE);
-			Structure structure = BuildType.getStructure(buildSelection);
-			for (Point point : structure.getPoints()) {
-				g2.fillRect((point.x*Building.SIZE)+x, (point.y*Building.SIZE)+y, Building.SIZE, Building.SIZE);
-			}
+			
+			Building building = BuildType.getInstance(buildSelection, x, y, null);
+			int range = building.getRange();
+			Point center = building.getCenter();
+			g2.setColor(Color.DARK_GRAY);
+			g2.fillOval(center.x-range/2, center.y-range/2, range, range);
+			building.paint(g2);
 		}
+		
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 	}
 
 	public static void startWaveCooldown() {
@@ -144,18 +150,8 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			buildSelection = null;
-			clickSelection = null;
-		} else if (e.getKeyCode() == KeyEvent.VK_1) {
-			buildSelection = BuildType.Turret;
-			clickSelection = ClickType.Build;
-		} else if (e.getKeyCode() == KeyEvent.VK_2) {
-			buildSelection = BuildType.Wall;
-			clickSelection = ClickType.Build;
-		} else if (e.getKeyCode() == KeyEvent.VK_3) {
-			clickSelection = ClickType.Remove;
-		}
+		buildSelection = BuildType.getType(e.getKeyCode());
+		clickSelection = ClickType.getType(e.getKeyCode());
 	}
 
 	@Override

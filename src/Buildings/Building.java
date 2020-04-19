@@ -9,10 +9,15 @@ import java.util.ArrayList;
 public class Building {
 	public static final int SIZE = 32;
 	protected ArrayList<Rectangle> collisionBox = new ArrayList<Rectangle>();
+	protected int range = 0;
+	protected Point center;
 
 	public Building(int x, int y) {
 		collisionBox.add(new Rectangle(x, y, SIZE, SIZE));
 		collisionBox.addAll(BuildType.getStructure(getBuildingType()).getCollisionBox(x, y));
+		
+		Rectangle rect = collisionBox.get(0);
+		center = new Point(rect.x+SIZE/2, rect.y+SIZE/2);
 	}
 	
 	public ArrayList<Rectangle> getCollisionBox() {
@@ -31,14 +36,20 @@ public class Building {
 		return false;
 	}
 	
+	public int getRange() {
+		return range;
+	}
+	
+	public Point getCenter() {
+		return center;
+	}
+	
 	public BuildType getBuildingType() {
 		return null;
 	}
 
 	public void tick(long delta) {
 	}
-	
-	//getCenter
 
 	public void paint(Graphics2D g2) {
 		g2.setColor(Color.blue);

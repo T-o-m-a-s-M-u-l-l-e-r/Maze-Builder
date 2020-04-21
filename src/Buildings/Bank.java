@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import Enums.BuildType;
 import Utility.Assets;
 
 public class Bank extends Building {

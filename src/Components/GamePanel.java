@@ -18,12 +18,11 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-import Buildings.BuildType;
 import Buildings.Building;
-import Buildings.Structure;
 import Enemies.Enemy;
+import Enums.BuildType;
+import Enums.ClickType;
 import Levels.Level;
-import Utility.Assets;
 
 public class GamePanel extends JPanel implements MouseListener, KeyListener, MouseMotionListener {
 	private BuildType buildSelection = null;

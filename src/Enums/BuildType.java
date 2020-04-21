@@ -1,9 +1,14 @@
-package Buildings;
+package Enums;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import Buildings.Bank;
+import Buildings.Building;
+import Buildings.Building.Structure;
+import Buildings.Turret;
+import Buildings.Wall;
 import Enemies.Enemy;
 
 public enum BuildType {

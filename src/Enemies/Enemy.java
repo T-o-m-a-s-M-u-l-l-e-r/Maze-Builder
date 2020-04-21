@@ -1,4 +1,5 @@
 package Enemies;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -7,10 +8,9 @@ import java.util.ArrayList;
 
 import Components.GamePanel;
 import Utility.Animation;
-import Utility.Utility;
 
 public class Enemy {
-	public static final int DEFAULT_BOUNTY = 30;
+	public static final int DEFAULT_BOUNTY = 15;
 	public static final int DEFAULT_WIDTH = 16;
 	public static final int DEFAULT_HEIGHT = 16;
 	public static final int DEFAULT_HEALTH = 50;
@@ -36,13 +36,12 @@ public class Enemy {
 		bar = new HealthBar(this);
 		this.path = path;
 		
-		ArrayList<BufferedImage> frames = getFrames();
-		texture = frames.get(0);
-		animation = new Animation(frames, .15);
+		animation = getAnimation();
+		texture = animation.getFrame(0);
 	}
-	
-	public ArrayList<BufferedImage> getFrames() {
-		return Utility.getTiles("an.png", 32, 32);
+
+	public Animation getAnimation() {
+		return null;
 	}
 	
 	public void paint(Graphics2D g2) {
@@ -147,5 +146,26 @@ public class Enemy {
 	public boolean moveToPosition(Point point) {
 		return moveToPosition(point.x, point.y);
 	}
+	
+	public class HealthBar {
+		private Enemy enemy;
+		private double height = 5;
+		private double width = 25;
+		private int yOffset = 5;
+		
+		public HealthBar(Enemy enemy) {
+			this.enemy = enemy;
+		}
+		
+		public void paint(Graphics2D g2) {
+			g2.setColor(Color.black);
+			g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getCollisionBox().height/2-yOffset-height/2), (int)width, (int)height);
+			double percWidth = width*(enemy.getHealth()/enemy.getMaxHealth());
+			g2.setColor(Color.red);
+			g2.fillRect((int)(enemy.getCenterX()-width/2), (int)(enemy.getCenterY()-enemy.getCollisionBox().height/2-yOffset-height/2), (int)percWidth, (int)height);
+		}
+		
+	}
+
 	
 }

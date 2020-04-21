@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import Enemies.Enemy;
+import Enemies.WalkingEnemy;
 
 public class Wave {
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
@@ -24,7 +25,9 @@ public class Wave {
 	
 	public void setPath(ArrayList<Point> path) {
 		for (Enemy enemy : enemies) {
+			if (enemy instanceof WalkingEnemy) {
 			enemy.setPath(path);
+			}
 		}
 	}
 	

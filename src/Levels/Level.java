@@ -14,17 +14,14 @@ import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Buildings.Bank;
-import Buildings.BuildType;
 import Buildings.Building;
-import Buildings.EnemyType;
-import Buildings.Structure;
 import Buildings.Turret;
-import Buildings.Wall;
 import Buildings.Turret.Projectile;
 import Components.GamePanel;
 import Components.Launcher;
 import Enemies.Enemy;
+import Enums.BuildType;
+import Enums.EnemyType;
 import Utility.Assets;
 import Utility.Utility;
 
@@ -103,12 +100,11 @@ public class Level {
 
 		Building building = BuildType.getInstance(type, mapX * Building.SIZE, mapY * Building.SIZE, enemies);
 
-		Structure structure = BuildType.getStructure(type);
-		if (!checkBuildingCollision(mapX, mapY, structure.getPoints()) && !waveOngoing) {
+		if (!checkBuildingCollision(building.getCollisionBox()) && !waveOngoing) {
 			int[][] tempArray = Utility.copyArray(buildingMap);
-			tempArray[mapX][mapY] = 1;
-			for (Point point : structure.getPoints()) {
-				tempArray[mapX + point.x][mapY + point.y] = 1;
+			
+			for (Rectangle rectangle : building.getCollisionBox()) {
+				tempArray[rectangle.x/Building.SIZE][rectangle.y/Building.SIZE] = 1;
 			}
 
 			if (adaptPath(tempArray)) {
@@ -207,16 +203,16 @@ public class Level {
 		}
 
 		try {
-			for (Enemy enemy : enemies) {
-				enemy.paint(g2);
+			for (Building building : buildings) {
+				building.paint(g2);
 			}
 		} catch (ConcurrentModificationException e) {
 
 		}
-
+		
 		try {
-			for (Building building : buildings) {
-				building.paint(g2);
+			for (Enemy enemy : enemies) {
+				enemy.paint(g2);
 			}
 		} catch (ConcurrentModificationException e) {
 
@@ -270,21 +266,20 @@ public class Level {
 		}
 	}
 
-	public boolean checkBuildingCollision(int mapX, int mapY, Point[] pointStructure) {
-		try {
-			if (buildingMap[mapX][mapY] != 0) {
+	public boolean checkBuildingCollision(ArrayList<Rectangle> collisionBox) {
+		for (Rectangle rectangle : collisionBox) {
+			int x = rectangle.x/Building.SIZE;
+			int y = rectangle.y/Building.SIZE;
+			
+			try {
+			if (buildingMap[x][y] != 0) {
 				return true;
 			}
-
-			for (int i = 0; i < pointStructure.length; i++) {
-				if (buildingMap[mapX + pointStructure[i].x][mapY + pointStructure[i].y] != 0) {
-					return true;
-				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				return true;
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return true;
 		}
-
+		
 		return false;
 	}
 

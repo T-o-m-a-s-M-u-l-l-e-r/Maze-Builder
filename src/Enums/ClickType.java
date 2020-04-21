@@ -1,8 +1,6 @@
-package Components;
+package Enums;
 
 import java.awt.event.KeyEvent;
-
-import Buildings.BuildType;
 
 public enum ClickType {
 	Build, Remove;

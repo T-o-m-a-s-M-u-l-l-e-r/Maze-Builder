@@ -26,7 +26,7 @@ public class Enemy {
 	protected double speed = DEFAULT_SPEED;
 	protected boolean alive = true;
 	protected Animation animation;
-	protected BufferedImage texture;
+	protected BufferedImage currentFrame;
 
 	public Enemy(ArrayList<Point> path) {
 		Point spawnPoint = path.get(0);
@@ -37,7 +37,7 @@ public class Enemy {
 		this.path = path;
 		
 		animation = getAnimation();
-		texture = animation.getFrame(0);
+		currentFrame = animation.getFrame(0);
 	}
 
 	public Animation getAnimation() {
@@ -45,7 +45,7 @@ public class Enemy {
 	}
 	
 	public void paint(Graphics2D g2) {
-		g2.drawImage(texture, (int)x, (int)y, collisionBox.width, collisionBox.height, null);
+		g2.drawImage(currentFrame, (int)x, (int)y, collisionBox.width, collisionBox.height, null);
 		bar.paint(g2);
 	}
 	
@@ -102,7 +102,7 @@ public class Enemy {
 			}
 		}
 		collisionBox.setLocation((int)x, (int)y);
-		texture = animation.getFrame(delta);
+		currentFrame = animation.getFrame(delta);
 	}
 	
 	public boolean moveToPosition(double toX, double toY) {

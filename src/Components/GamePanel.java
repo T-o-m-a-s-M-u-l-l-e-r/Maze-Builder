@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 
 import Buildings.Building;
@@ -35,12 +36,25 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	private static int levelNumber = 0;
 
 	public GamePanel() {
+		initLayout();
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		setPreferredSize(new Dimension(512, 512));
+		requestFocusInWindow();
 
 		levels = new File("Levels");
 		nextLevel();
+	}
+
+	public void initLayout() {
+		setBackground(new Color(204, 0, 51));
+		setPreferredSize(new Dimension(512, 512));
+
+		GroupLayout gamePanelLayout = new GroupLayout(this);
+		setLayout(gamePanelLayout);
+		gamePanelLayout.setHorizontalGroup(
+				gamePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0, 512, Short.MAX_VALUE));
+		gamePanelLayout.setVerticalGroup(
+				gamePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0, 512, Short.MAX_VALUE));
 	}
 
 	public static void nextLevel() {
@@ -63,22 +77,22 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
 		g2.drawString("1 - Turret \n 2 - Wall \n 3 - Bank \n 4 - Remove", 8, 52);
 	}
-	
+
 	public void showBuildingPreview(Graphics2D g2) {
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-		
+
 		if (buildSelection != null) {
-			int x = ((mouseX)/Building.SIZE)*Building.SIZE;
-			int y = ((mouseY)/Building.SIZE)*Building.SIZE;
-			
+			int x = ((mouseX) / Building.SIZE) * Building.SIZE;
+			int y = ((mouseY) / Building.SIZE) * Building.SIZE;
+
 			Building building = BuildType.getInstance(buildSelection, x, y, null);
 			int range = building.getRange();
 			Point center = building.getCenter();
 			g2.setColor(Color.DARK_GRAY);
-			g2.fillOval(center.x-range/2, center.y-range/2, range, range);
+			g2.fillOval(center.x - range / 2, center.y - range / 2, range, range);
 			building.paint(g2);
 		}
-		
+
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 	}
 
@@ -94,6 +108,14 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 
 	public static void deleteEnemy(Enemy e, boolean reachedEnd) {
 		currentLevel.deleteEnemy(e, reachedEnd);
+	}
+	
+	public int getHealth() {
+		return currentLevel.playerHealth;
+	}
+	
+	public int getMoney() {
+		return currentLevel.playerMoney;
 	}
 
 	public static void gameOver() {
@@ -113,10 +135,14 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (e.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK && clickSelection != null) {
-			
+
 			switch (clickSelection) {
-			case Build: currentLevel.build(e, buildSelection); break;
-			case Remove: currentLevel.remove(e); break;
+			case Build:
+				currentLevel.build(e, buildSelection);
+				break;
+			case Remove:
+				currentLevel.remove(e);
+				break;
 			}
 			buildSelection = null;
 			clickSelection = null;
@@ -145,6 +171,14 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public void setBuildSelection(BuildType buildSelection) {
+		this.buildSelection = buildSelection;
+	}
+	
+	public void setClickSelection(ClickType clickSelection) {
+		this.clickSelection = clickSelection;
 	}
 
 	@Override

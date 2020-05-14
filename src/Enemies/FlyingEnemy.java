@@ -36,7 +36,7 @@ public class FlyingEnemy extends Enemy {
 		AffineTransform trans = new AffineTransform();
 		trans.rotate(Math.toRadians(-angle), getCenterX(), getCenterY());
 		g2.setTransform(trans);
-		g2.drawImage(texture, (int) x, (int) y, collisionBox.width, collisionBox.height, null);
+		g2.drawImage(currentFrame, (int) x, (int) y, collisionBox.width, collisionBox.height, null);
 		trans.rotate(Math.toRadians(angle), getCenterX(), getCenterY());
 		g2.setTransform(trans);
 		bar.paint(g2);

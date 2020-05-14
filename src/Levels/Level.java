@@ -28,6 +28,7 @@ import Utility.Utility;
 public class Level {
 	public static final long SPAWN_ENEMY_CD = 1000;
 	public static final long ENEMY_WAVE_CD = 10000;
+	public static int numberOfWaves, waveNumber = 1;
 	public int playerHealth, playerMoney;
 	private char[][] tileMap = new char[Launcher.FRAME_WIDTH / GamePanel.TILE_WIDTH][Launcher.FRAME_HEIGHT
 			/ GamePanel.TILE_HEIGHT];
@@ -48,6 +49,8 @@ public class Level {
 		playerMoney = 5000;
 		try {
 			readFile(levels);
+		} catch (NullPointerException e) {
+			GamePanel.gameOver();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,6 +68,7 @@ public class Level {
 	}
 
 	public boolean nextWave() {
+		waveNumber++;
 		waveOngoing = true;
 		currentWave = waves.get(0);
 
@@ -311,6 +315,7 @@ public class Level {
 	}
 
 	public void readFile(File file) throws Exception {
+		numberOfWaves = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line;
 		int count = 0;
@@ -352,6 +357,7 @@ public class Level {
 				}
 				
 				waves.add(new Wave(enemies));
+				numberOfWaves++;
 			}
 		}
 		reader.close();

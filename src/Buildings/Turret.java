@@ -14,7 +14,7 @@ import Enums.BuildType;
 import Utility.Assets;
 
 public class Turret extends Building {
-	public static final int RANGE = 105;
+	public static final int RANGE = 115;
 	private int cooldown = 1000;
 	private boolean canShoot = true;
 	private Rectangle centerBox;

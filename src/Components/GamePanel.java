@@ -12,11 +12,13 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.GroupLayout;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Buildings.Building;
@@ -60,11 +62,10 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public static void nextLevel() {
 		currentLevel = new Level(levels, levelNumber);
 		levelNumber++;
-		startWaveCooldown();
 	}
-
-	public static void main(String[] args) {
-		new Launcher();
+	
+	public static Level getCurrentLevel() {
+		return currentLevel;
 	}
 
 	@Override
@@ -73,9 +74,6 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		currentLevel.paint(g2);
 
 		showBuildingPreview(g2);
-		g2.setColor(Color.black);
-		g2.drawString(String.valueOf(currentLevel.playerMoney), 5, 20);
-		g2.drawString("1 - Turret \n 2 - Wall \n 3 - Bank \n 4 - Remove", 8, 52);
 	}
 
 	public void showBuildingPreview(Graphics2D g2) {
@@ -89,21 +87,11 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 			int range = building.getRange();
 			Point center = building.getCenter();
 			g2.setColor(Color.DARK_GRAY);
-			g2.fillOval(center.x - range / 2, center.y - range / 2, range, range);
+			g2.fillOval(center.x - range, center.y - range, range*2, range*2);
 			building.paint(g2);
 		}
 
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
-	}
-
-	public static void startWaveCooldown() {
-		new Timer().schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				currentLevel.nextWave();
-			}
-		}, Level.ENEMY_WAVE_CD);
 	}
 
 	public static void deleteEnemy(Enemy e, boolean reachedEnd) {
@@ -116,10 +104,6 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	
 	public int getMoney() {
 		return currentLevel.playerMoney;
-	}
-
-	public static void gameOver() {
-		System.out.println("Game Over");
 	}
 
 	public void tick(long delta) {

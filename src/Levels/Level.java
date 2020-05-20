@@ -27,7 +27,6 @@ import Utility.Utility;
 
 public class Level {
 	public static final long SPAWN_ENEMY_CD = 1000;
-	public static final long ENEMY_WAVE_CD = 10000;
 	public static int numberOfWaves, waveNumber = 1;
 	public int playerHealth, playerMoney;
 	private char[][] tileMap = new char[Launcher.FRAME_WIDTH / GamePanel.TILE_WIDTH][Launcher.FRAME_HEIGHT
@@ -50,25 +49,14 @@ public class Level {
 		try {
 			readFile(levels);
 		} catch (NullPointerException e) {
-			GamePanel.gameOver();
+			Launcher.gameOver(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void test() {
-		System.out.println(buildings.size());
-
-		for (int y = 0; y < buildingMap[0].length; y++) {
-			for (int x = 0; x < buildingMap.length; x++) {
-				System.out.print(buildingMap[x][y]);
-			}
-			System.out.println();
-		}
-	}
-
-	public boolean nextWave() {
-		waveNumber++;
+	public void nextWave() {
+		if (!waveOngoing) {
 		waveOngoing = true;
 		currentWave = waves.get(0);
 
@@ -86,8 +74,7 @@ public class Level {
 				}
 			}
 		}, 0, SPAWN_ENEMY_CD);
-
-		return true;
+		}
 	}
 
 	public void setPath(ArrayList<Point> path) {
@@ -145,10 +132,11 @@ public class Level {
 
 	public void deleteEnemy(Enemy e, boolean reachedEnd) {
 		enemies.remove(e);
+		System.out.println(e.getBounty());
 
 		if (reachedEnd) {
 			if (damagePlayer(10)) {
-				GamePanel.gameOver();
+				Launcher.gameOver(false);
 			}
 		} else {
 			bounty += e.getBounty();
@@ -156,6 +144,7 @@ public class Level {
 
 		if (enemies.isEmpty() && currentWave.isEmpty()) {
 			waveOngoing = false;
+			waveNumber++;
 		}
 
 		if (!waveOngoing) {
@@ -164,8 +153,6 @@ public class Level {
 
 			if (waves.isEmpty()) {
 				GamePanel.nextLevel();
-			} else {
-				GamePanel.startWaveCooldown();
 			}
 		}
 	}
@@ -235,16 +222,15 @@ public class Level {
 
 	public void paintPath(Graphics2D g2) {
 		for (Point point : path) {
+			BufferedImage texture = Assets.pathTile;
 			
 			if (path.indexOf(point) == 0) {
-				g2.drawImage(Assets.pathEndTile, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
-				continue;
+				texture = Assets.pathStartTile;
 			} else if (path.indexOf(point) == path.size()-1) {
-				g2.drawImage(Assets.pathEndTile, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
-				break;
+				texture = Assets.pathEndTile;
 			}
 			
-			g2.drawImage(Assets.pathTile, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
+			g2.drawImage(texture, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
 			
 			Point nextPoint = path.get(path.indexOf(point)+1);
 			

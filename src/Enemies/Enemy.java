@@ -53,6 +53,10 @@ public class Enemy {
 		return bounty;
 	}
 	
+	public void increaseBounty(int bonus) {
+		bounty += bonus;
+	}
+	
 	public void setPath(ArrayList<Point> path) {
 		this.path = path;
 	}

@@ -4,18 +4,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 public class Launcher extends JFrame implements KeyListener {
+	private static Launcher launcher;
 	private UserInterfacePanel interfacePanel;
 	private GamePanel gamePanel;
 	public static final int FRAME_WIDTH = 512;
 	public static final int FRAME_HEIGHT = 512;
 	public static final int FPS = 60;
 
-	public Launcher() {
+	private Launcher() {
 		super("Game Game");
 		initComponents();
 		requestFocus();
@@ -54,9 +58,13 @@ public class Launcher extends JFrame implements KeyListener {
 		setVisible(true);
 		pack();
 	}
+	
+	public static void gameOver(boolean won) {
+		
+	}
 
 	public static void main(String args[]) {
-		new Launcher();
+		launcher = new Launcher();
 	}
 
 	@Override

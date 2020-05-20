@@ -23,7 +23,7 @@ public enum BuildType {
 	
 	public static Building getInstance(BuildType type, int x, int y, ArrayList<Enemy> enemies) {
 		switch (type) {
-		case Bank: return new Bank(x, y);
+		case Bank: return new Bank(x, y, enemies);
 		case Wall: return new Wall(x, y);
 		case Turret: return new Turret(x, y, enemies);
 		default: return null;

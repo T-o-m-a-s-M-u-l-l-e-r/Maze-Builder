@@ -20,4 +20,7 @@ public class Assets {
 	public static final BufferedImage turretTile = tileSet.get(7);
 	public static final BufferedImage projectileTile = tileSet.get(8);
 	public static final BufferedImage pathStartTile = tileSet.get(9);
+	public static final BufferedImage bankTile_1 = tileSet.get(10);
+	public static final BufferedImage bankTile_2 = tileSet.get(11);
+	public static final BufferedImage bankTile_3 = tileSet.get(12);
 }

@@ -226,5 +226,11 @@ public class UserInterfacePanel extends JPanel {
 		nextWaveButton.setFocusPainted(false);
 		nextWaveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 		nextWaveButton.setFocusable(false);
+		nextWaveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GamePanel.getCurrentLevel().nextWave();
+			}
+		});
 	}
 }

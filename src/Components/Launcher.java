@@ -2,14 +2,19 @@ package Components;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.WindowConstants;
+
+import Utility.Assets;
 
 public class Launcher extends JFrame implements KeyListener {
 	private static Launcher launcher;
@@ -20,9 +25,20 @@ public class Launcher extends JFrame implements KeyListener {
 	public static final int FPS = 60;
 
 	private Launcher() {
-		super("Game Game");
+		super("Maze Builder");
+		ArrayList<BufferedImage> icons = new ArrayList<BufferedImage>();
+		icons.add(Assets.icon_game_128);
+		icons.add(Assets.icon_game_64);
+		icons.add(Assets.icon_game_32);
+		icons.add(Assets.icon_game_16);
+		setIconImages(icons);
 		initComponents();
 		requestFocus();
+		setLocationRelativeTo(null);
+		Font font = new Font("Bodoni MT Black", 1, 24);
+		new CustomDialog("Tip of the day", 320, 75, null,
+				"<html><b>Tip: </b>Try to block the enemies' path by placing walls and turrets in their way. They'll find a way around them!",
+				null).setVisible(true);
 
 		long lastTime = System.nanoTime();
 		double timePerFrame = 1000000000 / FPS;
@@ -37,9 +53,30 @@ public class Launcher extends JFrame implements KeyListener {
 				interfacePanel.tick(delta);
 				delta -= timePerFrame;
 			}
-			
+
 			repaint();
 		}
+	}
+
+	static class CustomDialog extends JDialog {
+		public CustomDialog(String title, int width, int height, ImageIcon icon, String text, Font font) {
+			super(launcher);
+			setTitle(title);
+			setModal(true);
+			setResizable(false);
+			setSize(new Dimension(width, height));
+			setAutoRequestFocus(true);
+			setLocationRelativeTo(null);
+
+			JLabel label = new JLabel(icon);
+			label.setHorizontalTextPosition(JLabel.CENTER);
+			label.setVerticalTextPosition(JLabel.CENTER);
+			label.setFont(font);
+			label.setText(text);
+
+			getContentPane().add(label);
+		}
+
 	}
 
 	private void initComponents() {
@@ -54,13 +91,21 @@ public class Launcher extends JFrame implements KeyListener {
 
 		getContentPane().add(gamePanel);
 		getContentPane().add(interfacePanel);
-
 		setVisible(true);
 		pack();
 	}
-	
+
 	public static void gameOver(boolean won) {
-		
+		CustomDialog gameOverDialog;
+		if (won) {
+			Font font = new Font("Bodoni MT Black", 1, 24);
+			gameOverDialog = new CustomDialog("Congratulations!", 270, 200, Assets.gif_win, "You have won!", font);
+		} else {
+			gameOverDialog = new CustomDialog("Game Over", 270, 180, Assets.gif_loss, "", null);
+		}
+		gameOverDialog.setVisible(true);
+
+		System.exit(0);
 	}
 
 	public static void main(String args[]) {

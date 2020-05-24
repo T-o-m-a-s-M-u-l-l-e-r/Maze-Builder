@@ -1,11 +1,10 @@
 package Enemies;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import Utility.Animation;
-import Utility.Utility;
+import Utility.Assets;
 
 public class WalkingEnemy extends Enemy {
 	public static final int DEFAULT_BOUNTY = 30;
@@ -17,7 +16,7 @@ public class WalkingEnemy extends Enemy {
 	
 	@Override
 	public Animation getAnimation() {
-		return new Animation(Utility.getTiles("an.png", 32, 32), .5f);
+		return Assets.animation_walkingEnemy;
 	}
 
 }

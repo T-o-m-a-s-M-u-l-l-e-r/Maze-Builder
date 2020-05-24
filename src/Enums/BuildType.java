@@ -38,4 +38,13 @@ public enum BuildType {
 			default: return null;
 		}
 	}
+	
+	public static int getCost(BuildType type) {
+		switch(type) {
+		case Bank: return 500;
+		case Turret: return 200;
+		case Wall: return 10;
+		default: return 9999;
+		}
+	}
 }

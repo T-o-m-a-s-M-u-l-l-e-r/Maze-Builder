@@ -14,6 +14,7 @@ import Enums.BuildType;
 import Utility.Assets;
 
 public class Turret extends Building {
+	public static final int DAMAGE = 25;
 	public static final int RANGE = 115;
 	private int cooldown = 1000;
 	private boolean canShoot = true;
@@ -40,7 +41,7 @@ public class Turret extends Building {
 	@Override
 	public void paint(Graphics2D g2) {
 		for (Rectangle rectangle : collisionBox) {
-			g2.drawImage(Assets.turretTile, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+			g2.drawImage(Assets.tile_turret, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
 		}
 		try {
 			for (Projectile projectile : projectiles) {
@@ -94,8 +95,7 @@ public class Turret extends Building {
 		private double speed = 6.5;
 		private Rectangle collisionBox;
 		public static final int SIZE = 16;
-		private int damage = 25;
-		private BufferedImage texture = Assets.projectileTile;
+		private BufferedImage texture = Assets.tile_turret_projectile;
 
 		public Projectile(double x, double y, Enemy enemy) {
 			this.enemy = enemy;
@@ -124,7 +124,7 @@ public class Turret extends Building {
 
 			if (checkEnemyCollision()) {
 				projectiles.remove(this);
-				enemy.dealDamage(damage);
+				enemy.dealDamage(Turret.DAMAGE);
 			}
 
 		}

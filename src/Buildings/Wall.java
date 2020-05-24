@@ -19,7 +19,7 @@ public class Wall extends Building {
 	
 	public void paint(Graphics2D g2) {
 		for (Rectangle rectangle : collisionBox) {
-			g2.drawImage(Assets.wallTile, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+			g2.drawImage(Assets.tile_wall, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
 		}
 	}
 

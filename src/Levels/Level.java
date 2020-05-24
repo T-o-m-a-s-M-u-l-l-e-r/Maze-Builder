@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
@@ -19,15 +20,17 @@ import Buildings.Turret;
 import Buildings.Turret.Projectile;
 import Components.GamePanel;
 import Components.Launcher;
+import Components.UserInterfacePanel;
 import Enemies.Enemy;
 import Enums.BuildType;
+import Enums.ClickType;
 import Enums.EnemyType;
 import Utility.Assets;
 import Utility.Utility;
 
 public class Level {
 	public static final long SPAWN_ENEMY_CD = 1000;
-	public static int numberOfWaves, waveNumber = 1;
+	public static int numberOfWaves, waveNumber;
 	public int playerHealth, playerMoney;
 	private char[][] tileMap = new char[Launcher.FRAME_WIDTH / GamePanel.TILE_WIDTH][Launcher.FRAME_HEIGHT
 			/ GamePanel.TILE_HEIGHT];
@@ -42,38 +45,39 @@ public class Level {
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Building> buildings = new ArrayList<Building>();
 
-	public Level(File levels, int levelNumber) {
+	public Level(int levelNumber) {
 		this.levelNumber = levelNumber;
-		playerHealth = 500;
-		playerMoney = 5000;
+		playerHealth = 120;
+		playerMoney = 350;
+		waveNumber = 1;
 		try {
-			readFile(levels);
-		} catch (NullPointerException e) {
-			Launcher.gameOver(true);
+			readFile(Assets.levels);
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
 	public void nextWave() {
 		if (!waveOngoing) {
-		waveOngoing = true;
-		currentWave = waves.get(0);
+			waveOngoing = true;
+			currentWave = waves.get(0);
+			UserInterfacePanel.waveProgressBar.setMaximum(currentWave.getSize());
+			UserInterfacePanel.waveProgressBar.setValue(0);
 
-		new Timer().scheduleAtFixedRate(new TimerTask() {
+			new Timer().scheduleAtFixedRate(new TimerTask() {
 
-			@Override
-			public void run() {
-				Enemy enemy = currentWave.getNextEnemy();
-				if (enemy != null) {
-					enemies.add(enemy);
+				@Override
+				public void run() {
+					Enemy enemy = currentWave.getNextEnemy();
+					if (enemy != null) {
+						enemies.add(enemy);
+						UserInterfacePanel.waveProgressBar.setValue(UserInterfacePanel.waveProgressBar.getValue() + 1);
+					}
+					if (currentWave.isEmpty()) {
+						waves.remove(currentWave);
+						cancel();
+					}
 				}
-				if (currentWave.isEmpty()) {
-					waves.remove(currentWave);
-					cancel();
-				}
-			}
-		}, 0, SPAWN_ENEMY_CD);
+			}, 0, SPAWN_ENEMY_CD);
 		}
 	}
 
@@ -84,7 +88,7 @@ public class Level {
 	}
 
 	public void build(MouseEvent e, BuildType type) {
-		int cost = 50;
+		int cost = BuildType.getCost(type);
 
 		int mapX = e.getX() / Building.SIZE;
 		int mapY = e.getY() / Building.SIZE;
@@ -93,13 +97,14 @@ public class Level {
 
 		if (!checkBuildingCollision(building.getCollisionBox()) && !waveOngoing) {
 			int[][] tempArray = Utility.copyArray(buildingMap);
-			
+
 			for (Rectangle rectangle : building.getCollisionBox()) {
-				tempArray[rectangle.x/Building.SIZE][rectangle.y/Building.SIZE] = 1;
+				tempArray[rectangle.x / Building.SIZE][rectangle.y / Building.SIZE] = 1;
 			}
 
-			if (adaptPath(tempArray)) {
-				if (!spendMoney(cost)) {
+			if (playerMoney >= cost) {
+				if (adaptPath(tempArray)) {
+					playerMoney -= cost;
 					buildings.add(building);
 					buildingMap = Utility.copyArray(tempArray);
 				}
@@ -108,7 +113,7 @@ public class Level {
 	}
 
 	public void remove(MouseEvent e) {
-		if (!waveOngoing) {
+		if (!waveOngoing && playerMoney >= ClickType.getCost(ClickType.Remove)) {
 			Building buildingToRemove = null;
 
 			for (Building building : buildings) {
@@ -124,15 +129,14 @@ public class Level {
 				}
 				buildings.remove(buildingToRemove);
 				adaptPath(buildingMap);
+				playerMoney -= ClickType.getCost(ClickType.Remove);
 			} catch (NullPointerException a) {
-
 			}
 		}
 	}
 
 	public void deleteEnemy(Enemy e, boolean reachedEnd) {
 		enemies.remove(e);
-		System.out.println(e.getBounty());
 
 		if (reachedEnd) {
 			if (damagePlayer(10)) {
@@ -144,6 +148,7 @@ public class Level {
 
 		if (enemies.isEmpty() && currentWave.isEmpty()) {
 			waveOngoing = false;
+			UserInterfacePanel.waveProgressBar.setValue(0);
 			waveNumber++;
 		}
 
@@ -176,12 +181,29 @@ public class Level {
 			for (int y = 0; y < tileMap[0].length; y++) {
 				BufferedImage texture = null;
 				switch (tileMap[x][y]) {
-				case '0': texture = Assets.plantTile_1; break;
-				case '1': texture = Assets.plantTile_2; break;
-				case '2': texture = Assets.plantTile_3; break;
-				case '3': texture = Assets.grassTile; break;		
+				case '0':
+					texture = Assets.tile_grass1_1;
+					break;
+				case '1':
+					texture = Assets.tile_grass1_2;
+					break;
+				case '2':
+					texture = Assets.tile_grass1_3;
+					break;
+				case '3':
+					texture = Assets.tile_grass1_4;
+					break;
+				case '4':
+					texture = Assets.tile_grass2_1;
+					break;
+				case '5':
+					texture = Assets.tile_grass2_2;
+					break;
+				case '6':
+					texture = Assets.tile_grass2_3;
+					break;
 				}
-				
+
 				g2.drawImage(texture, x * GamePanel.TILE_WIDTH, y * GamePanel.TILE_HEIGHT, GamePanel.TILE_WIDTH,
 						GamePanel.TILE_HEIGHT, null);
 			}
@@ -200,7 +222,7 @@ public class Level {
 		} catch (ConcurrentModificationException e) {
 
 		}
-		
+
 		try {
 			for (Enemy enemy : enemies) {
 				enemy.paint(g2);
@@ -216,60 +238,61 @@ public class Level {
 		} catch (ConcurrentModificationException e) {
 
 		} catch (NoSuchElementException e) {
-			
+
 		}
 	}
 
 	public void paintPath(Graphics2D g2) {
 		for (Point point : path) {
-			BufferedImage texture = Assets.pathTile;
-			
-			if (path.indexOf(point) == 0) {
-				texture = Assets.pathStartTile;
-			} else if (path.indexOf(point) == path.size()-1) {
-				texture = Assets.pathEndTile;
+			BufferedImage texture = Assets.tile_path;
+
+			if (path.indexOf(point) == path.size() - 1) {
+				texture = Assets.tile_path_end;
 			}
-			
-			g2.drawImage(texture, (point.x/Building.SIZE)*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
-			
-			Point nextPoint = path.get(path.indexOf(point)+1);
-			
+
+			g2.drawImage(texture, (point.x / Building.SIZE) * Building.SIZE, (point.y / Building.SIZE) * Building.SIZE,
+					Building.SIZE, Building.SIZE, null);
+
+			Point nextPoint = path.get(path.indexOf(point) + 1);
+
 			if (point.y == nextPoint.y) {
-				
-				int x1 = point.x/Building.SIZE;
-				int x2 = nextPoint.x/Building.SIZE;
-				
-				for (int x = Math.min(x1, x2)+1; x < Math.max(x1, x2); x++) {
-					g2.drawImage(Assets.pathTile, x*Building.SIZE, (point.y/Building.SIZE)*Building.SIZE, Building.SIZE, Building.SIZE, null);
+
+				int x1 = point.x / Building.SIZE;
+				int x2 = nextPoint.x / Building.SIZE;
+
+				for (int x = Math.min(x1, x2) + 1; x < Math.max(x1, x2); x++) {
+					g2.drawImage(Assets.tile_path, x * Building.SIZE, (point.y / Building.SIZE) * Building.SIZE,
+							Building.SIZE, Building.SIZE, null);
 				}
-				
+
 			} else {
-				
-				int y1 = point.y/Building.SIZE;
-				int y2 = nextPoint.y/Building.SIZE;
-				
-				for (int y = Math.min(y1, y2)+1; y < Math.max(y1, y2); y++) {
-					g2.drawImage(Assets.pathTile, (point.x/Building.SIZE)*Building.SIZE, y*Building.SIZE, Building.SIZE, Building.SIZE, null);
+
+				int y1 = point.y / Building.SIZE;
+				int y2 = nextPoint.y / Building.SIZE;
+
+				for (int y = Math.min(y1, y2) + 1; y < Math.max(y1, y2); y++) {
+					g2.drawImage(Assets.tile_path, (point.x / Building.SIZE) * Building.SIZE, y * Building.SIZE,
+							Building.SIZE, Building.SIZE, null);
 				}
-				
+
 			}
 		}
 	}
 
 	public boolean checkBuildingCollision(ArrayList<Rectangle> collisionBox) {
 		for (Rectangle rectangle : collisionBox) {
-			int x = rectangle.x/Building.SIZE;
-			int y = rectangle.y/Building.SIZE;
-			
+			int x = rectangle.x / Building.SIZE;
+			int y = rectangle.y / Building.SIZE;
+
 			try {
-			if (buildingMap[x][y] != 0) {
-				return true;
-			}
+				if (buildingMap[x][y] != 0) {
+					return true;
+				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -282,13 +305,13 @@ public class Level {
 		} catch (ConcurrentModificationException e) {
 
 		}
-		
+
 		try {
 			for (Projectile projectile : Turret.projectiles) {
 				projectile.tick();
 			}
 		} catch (ConcurrentModificationException e) {
-			
+
 		}
 
 		try {
@@ -300,24 +323,27 @@ public class Level {
 		}
 	}
 
-	public void readFile(File file) throws Exception {
+	public void readFile(File file) throws NullPointerException, IOException {
 		numberOfWaves = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line;
 		int count = 0;
 		int y = 0;
-		while (y < Launcher.FRAME_HEIGHT / GamePanel.TILE_HEIGHT) {
-			line = reader.readLine();
 
-			if (line.isBlank()) {
-				count++;
-			} else if (count == levelNumber) {
-				for (int x = 0; x < line.length(); x++) {
-					tileMap[x][y] = line.charAt(x);
+		try {
+			while (y < Launcher.FRAME_HEIGHT / GamePanel.TILE_HEIGHT) {
+				line = reader.readLine();
+				if (line.isBlank()) {
+					count++;
+				} else if (count == levelNumber) {
+					for (int x = 0; x < line.length(); x++) {
+						tileMap[x][y] = line.charAt(x);
+					}
+					y++;
 				}
-				y++;
 			}
-
+		} catch (NullPointerException e) {
+			Launcher.gameOver(true);
 		}
 
 		String[] firstLine = reader.readLine().split("-");
@@ -335,13 +361,13 @@ public class Level {
 			} else {
 				ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 				String string = line.replaceAll(" ", "").trim();
-				
+
 				for (int i = 0; i < string.length(); i++) {
 					EnemyType type = EnemyType.getType(string.charAt(i));
 					Enemy enemy = EnemyType.getEnemy(type, path);
 					enemies.add(enemy);
 				}
-				
+
 				waves.add(new Wave(enemies));
 				numberOfWaves++;
 			}
@@ -354,15 +380,6 @@ public class Level {
 		if (playerHealth <= 0) {
 			return true;
 		} else {
-			return false;
-		}
-	}
-
-	public boolean spendMoney(int cost) {
-		if (playerMoney - cost < 0) {
-			return true;
-		} else {
-			playerMoney -= cost;
 			return false;
 		}
 	}

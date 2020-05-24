@@ -11,7 +11,7 @@ import Utility.Assets;
 
 public class Bank extends Building {
 	public static final int RANGE = 150;
-	public static final int BOUNTY_BONUS = 15;
+	public static final int BOUNTY_BONUS = 35;
 	private ArrayList<Enemy> enemies;
 	private ArrayList<Enemy> affected;
 
@@ -39,11 +39,9 @@ public class Bank extends Building {
 			if (distance <= range && !affected.contains(enemy)) {
 				enemy.increaseBounty(BOUNTY_BONUS);
 				affected.add(enemy);
-				System.out.println(enemy.getBounty());
 			} else if (distance > range && affected.contains(enemy)) {
 				enemy.increaseBounty(-BOUNTY_BONUS);
 				affected.remove(enemy);
-				System.out.println(enemy.getBounty());
 			}
 
 		}
@@ -57,11 +55,11 @@ public class Bank extends Building {
 
 	public void paint(Graphics2D g2) {
 		Rectangle rectangle = getCollisionBox().get(0);
-		g2.drawImage(Assets.bankTile_2, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+		g2.drawImage(Assets.tile_bank2, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
 		rectangle = getCollisionBox().get(1);
-		g2.drawImage(Assets.bankTile_1, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+		g2.drawImage(Assets.tile_bank1, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
 		rectangle = getCollisionBox().get(2);
-		g2.drawImage(Assets.bankTile_3, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
+		g2.drawImage(Assets.tile_bank3, rectangle.x, rectangle.y, rectangle.width, rectangle.height, null);
 	}
 
 }

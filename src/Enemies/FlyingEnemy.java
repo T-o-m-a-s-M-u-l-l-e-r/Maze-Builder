@@ -6,10 +6,10 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import Utility.Animation;
-import Utility.Utility;
+import Utility.Assets;
 
 public class FlyingEnemy extends Enemy {
-	public static final int DEFAULT_BOUNTY = 45;
+	public static final int DEFAULT_BOUNTY = 80;
 	private double angle;
 
 	public FlyingEnemy(ArrayList<Point> path) {
@@ -26,9 +26,10 @@ public class FlyingEnemy extends Enemy {
 		double b = spawnPoint.y - endPoint.y;
 		return Math.toDegrees(Math.atan(a / b));
 	}
-
+	
+	@Override
 	public Animation getAnimation() {
-		return new Animation(Utility.getTiles("ani.png", 47, 39), .15f);
+		return Assets.animation_flyingEnemy;
 	}
 
 	@Override

@@ -23,6 +23,10 @@ public class Wave {
 		return enemy;
 	}
 	
+	public int getSize() {
+		return enemies.size();
+	}
+	
 	public void setPath(ArrayList<Point> path) {
 		for (Enemy enemy : enemies) {
 			if (enemy instanceof WalkingEnemy) {

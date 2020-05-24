@@ -12,13 +12,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.GroupLayout;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Buildings.Building;
@@ -33,7 +29,6 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	public static final int TILE_WIDTH = 32;
 	public static final int TILE_HEIGHT = 32;
 	private int mouseX, mouseY;
-	private static File levels;
 	private static Level currentLevel;
 	private static int levelNumber = 0;
 
@@ -42,8 +37,6 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		requestFocusInWindow();
-
-		levels = new File("Levels");
 		nextLevel();
 	}
 
@@ -60,7 +53,7 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 	}
 
 	public static void nextLevel() {
-		currentLevel = new Level(levels, levelNumber);
+		currentLevel = new Level(levelNumber);
 		levelNumber++;
 	}
 	
@@ -128,6 +121,11 @@ public class GamePanel extends JPanel implements MouseListener, KeyListener, Mou
 				currentLevel.remove(e);
 				break;
 			}
+			buildSelection = null;
+			clickSelection = null;
+		}
+		
+		if (e.getModifiersEx() == InputEvent.BUTTON3_DOWN_MASK) {
 			buildSelection = null;
 			clickSelection = null;
 		}

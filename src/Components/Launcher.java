@@ -35,7 +35,6 @@ public class Launcher extends JFrame implements KeyListener {
 		initComponents();
 		requestFocus();
 		setLocationRelativeTo(null);
-		Font font = new Font("Bodoni MT Black", 1, 24);
 		new CustomDialog("Tip of the day", 320, 75, null,
 				"<html><b>Tip: </b>Try to block the enemies' path by placing walls and turrets in their way. They'll find a way around them!",
 				null).setVisible(true);

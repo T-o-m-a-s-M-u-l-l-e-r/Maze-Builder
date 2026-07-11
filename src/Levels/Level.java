@@ -48,7 +48,7 @@ public class Level {
 	public Level(int levelNumber) {
 		this.levelNumber = levelNumber;
 		playerHealth = 120;
-		playerMoney = 350;
+		playerMoney = 650;
 		waveNumber = 1;
 		try {
 			readFile(Assets.levels);

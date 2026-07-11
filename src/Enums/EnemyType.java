@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import Enemies.Enemy;
 import Enemies.FlyingEnemy;
 import Enemies.WalkingEnemy;
-import Utility.Animation;
-import Utility.Assets;
-import Utility.Utility;
 
 public enum EnemyType {
 	Walking, Flying;

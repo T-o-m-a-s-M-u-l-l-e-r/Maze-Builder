@@ -1,6 +1,6 @@
-##	Maze Builder
+##	Maze Builder <img src="icon_game_64.png" alt="Icon" width="48" style="vertical-align: middle; margin-left: 10px;"/>
 
-A 2D tower defense game built in Java using Swing and AWT. Place defensive structures to reroute enemies and stop them from reaching your base. Originally created as a personal project in 2021.
+A 2D tower defense game built in Java using Swing and AWT. Place defensive structures to reroute enemies and stop them from reaching your base. Originally created as a personal project in 2020.
 
 ![Gameplay GIF](screenshots/gameplay.gif)
 
